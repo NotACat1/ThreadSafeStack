@@ -3,5 +3,6 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
+  <Project Path="Tests/ModernThreadSafeStack.Tests/ModernThreadSafeStack.Tests.vcxproj" />
   <Project Path="ThreadSafeStack/ThreadSafeStack.vcxproj" />
 </Solution>
