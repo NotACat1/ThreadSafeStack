@@ -24,12 +24,18 @@
     <ClCompile Include="WaitingThreadSafeStack.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="SharedPtrWaitingThreadSafeStack.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ModernThreadSafeStack.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="WaitingThreadSafeStack.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="SharedPtrWaitingThreadSafeStack.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
