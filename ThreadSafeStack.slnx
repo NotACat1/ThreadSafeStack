@@ -3,6 +3,7 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Project Path="Tests/ModernThreadSafeStack.Tests/ModernThreadSafeStack.Tests.vcxproj" />
-  <Project Path="ThreadSafeStack/ThreadSafeStack.vcxproj" />
+  <Project Path="Tests/ModernThreadSafeStack.Tests/ModernThreadSafeStack.Tests.vcxproj" Id="7f150933-516e-4c74-89b3-73754086ff32" />
+  <Project Path="Tests/WaitingThreadSafeStack.Tests/WaitingThreadSafeStack.Tests.vcxproj" Id="763327fa-3786-480d-8bf6-856899243cd6" />
+  <Project Path="ThreadSafeStack/ThreadSafeStack.vcxproj" Id="fcf27f67-3832-4d60-a114-fd618ddb9116" />
 </Solution>
