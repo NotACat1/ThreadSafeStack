@@ -129,9 +129,11 @@
   <ItemGroup>
     <ClCompile Include="ModernThreadSafeStack.cpp" />
     <ClCompile Include="ThreadSafeStack.cpp" />
+    <ClCompile Include="WaitingThreadSafeStack.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ModernThreadSafeStack.h" />
+    <ClInclude Include="WaitingThreadSafeStack.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

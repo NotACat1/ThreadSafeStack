@@ -5,6 +5,7 @@
 #include <vector>
 #include <atomic>
 #include <string>
+
 #include "../../ThreadSafeStack/ModernThreadSafeStack.h"
 
 /**
