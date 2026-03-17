@@ -1,5 +1,7 @@
 #pragma once
 
+#include <boost/pool/pool_alloc.hpp>
+#include <boost/pool/singleton_pool.hpp>
 #include <memory>
 #include <mutex>
 #include <condition_variable>
@@ -7,52 +9,125 @@
 #include <chrono>
 
 /**
- * @brief A high-performance thread-safe LIFO stack using a linked-list structure.
- * * This implementation uses manual node management to allow for fine-grained
- * control over memory. By allocating nodes and data outside of critical
- * sections, it minimizes lock contention.
- * * Key Features:
- * - Iterative cleanup to prevent stack overflow on deep stacks.
- * - Blocking and timed-waiting pop operations.
- * - Shared pointer-based internal storage for exception safety and efficiency.
- * * @tparam ElementType Type of elements stored in the stack.
+ * @brief A blocking, thread-safe LIFO stack implemented as a singly linked list.
+ *
+ * This container supports concurrent access by multiple producer and consumer
+ * threads and provides blocking as well as timed waiting pop operations.
+ *
+ * Design objectives:
+ * - Minimize lock contention by performing memory allocation outside
+ *   critical sections.
+ * - Provide strong exception safety for push/pop operations.
+ * - Avoid recursive destruction for deep stacks.
+ * - Enable efficient transfer of large or non-trivially copyable objects.
+ *
+ * Concurrency model:
+ * - All structural modifications are protected by a single mutex.
+ * - Consumer threads may block on a condition variable until data becomes
+ *   available.
+ * - Spurious wakeups are handled via predicate-based waiting.
+ *
+ * Memory management:
+ * - Nodes are allocated from a thread-safe Boost singleton memory pool.
+ * - Element payloads are stored in std::shared_ptr to allow extraction
+ *   without copying while holding the mutex.
+ * - Node ownership is represented by std::unique_ptr with a custom deleter
+ *   returning memory to the pool.
+ *
+ * @tparam ElementType Type of elements stored in the stack.
  */
 template<typename ElementType>
 class ModernThreadSafeWaitingLinkedStack {
 private:
     /**
-     * @brief Internal node representing an entry in the stack.
+     * @brief Node representing a single stack entry.
+     *
+     * The stack is implemented as a singly linked list where each node
+     * contains:
+     * - A shared pointer to the stored element
+     * - A raw pointer to the next node
+     *
+     * The use of a raw pointer avoids recursive destruction chains that
+     * would occur with nested unique_ptr ownership and enables external
+     * memory pool management.
      */
     struct Node {
         std::shared_ptr<ElementType> data;
-        std::unique_ptr<Node> next;
+        Node* next;
 
         explicit Node(std::shared_ptr<ElementType> dataValue)
             : data(std::move(dataValue)), next(nullptr) {
         }
     };
 
-    /// Pointer to the top of the stack.
-    std::unique_ptr<Node> head_;
+    /// Tag type used to create a unique Boost singleton memory pool.
+    struct NodePoolTag {};
 
-    /// Mutex protecting the head_ pointer.
+    /**
+     * @brief Thread-safe global memory pool for Node allocations.
+     *
+     * singleton_pool guarantees that all allocations of this type share
+     * a single pool instance across threads, reducing allocation overhead
+     * and fragmentation.
+     */
+    using NodePool = boost::singleton_pool<NodePoolTag, sizeof(Node)>;
+
+    /**
+     * @brief Custom deleter that returns nodes to the pool.
+     *
+     * Ensures that:
+     * - The Node destructor is invoked explicitly
+     * - Memory is released back to the Boost pool
+     *
+     * This is required because nodes are allocated using placement new.
+     */
+    struct PoolDeleter {
+        void operator()(Node* ptr) const {
+            if (ptr) {
+                ptr->~Node();          // Destroy contained objects
+                NodePool::free(ptr);   // Return memory to pool
+            }
+        }
+    };
+
+    /// Owning smart pointer type for nodes.
+    using NodePtr = std::unique_ptr<Node, PoolDeleter>;
+
+    /// Pointer to the current top node (nullptr if empty).
+    NodePtr head_;
+
+    /**
+     * @brief Mutex protecting the internal linked list.
+     *
+     * All push and pop operations must hold this mutex while modifying
+     * the stack structure.
+     */
     mutable std::mutex stackMutex_;
 
-    /// Condition variable to notify waiting threads when data is pushed.
+    /**
+     * @brief Condition variable used to signal availability of data.
+     *
+     * Producers notify waiting consumers when a new element is pushed.
+     */
     std::condition_variable dataCondition_;
 
     /**
-     * @brief Internal helper to remove the top node from the stack.
-     * @return A unique pointer to the removed node, or nullptr if empty.
+     * @brief Removes the top node in a thread-safe manner.
+     *
+     * This function acquires the mutex, detaches the head node,
+     * and transfers ownership to the caller.
+     *
+     * @return Unique ownership of the removed node, or nullptr if empty.
      */
-    std::unique_ptr<Node> popHead() {
+    NodePtr popHead() {
         std::lock_guard<std::mutex> lock(stackMutex_);
+
         if (!head_) {
             return nullptr;
         }
 
-        std::unique_ptr<Node> oldHead = std::move(head_);
-        head_ = std::move(oldHead->next);
+        NodePtr oldHead = std::move(head_);
+        head_ = NodePtr(oldHead->next);
         return oldHead;
     }
 
@@ -83,12 +158,18 @@ public:
      * * @param newValue Value to be pushed.
      */
     void push(ElementType newValue) {
-        auto data = std::make_shared<ElementType>(std::move(newValue));
-        auto newNode = std::make_unique<Node>(data);
+        auto data = std::allocate_shared<ElementType>(
+            boost::fast_pool_allocator<ElementType>(),
+            std::move(newValue)
+        );
+
+        void* nodeMem = NodePool::malloc();
+        if (!nodeMem) throw std::bad_alloc();
+        NodePtr newNode(new (nodeMem) Node(std::move(data)));
 
         {
             std::lock_guard<std::mutex> lock(stackMutex_);
-            newNode->next = std::move(head_);
+            newNode->next = head_.release();
             head_ = std::move(newNode);
         }
         dataCondition_.notify_one();
@@ -102,8 +183,8 @@ public:
         std::unique_lock<std::mutex> lock(stackMutex_);
         dataCondition_.wait(lock, [this] { return head_ != nullptr; });
 
-        std::unique_ptr<Node> oldHead = std::move(head_);
-        head_ = std::move(oldHead->next);
+        NodePtr oldHead = std::move(head_);
+        head_ = NodePtr(oldHead->next);
 
         outputReference = std::move(*oldHead->data);
     }
@@ -116,10 +197,10 @@ public:
         std::unique_lock<std::mutex> lock(stackMutex_);
         dataCondition_.wait(lock, [this] { return head_ != nullptr; });
 
-        std::unique_ptr<Node> oldHead = std::move(head_);
-        head_ = std::move(oldHead->next);
+        NodePtr oldHead = std::move(head_);
+        head_ = NodePtr(oldHead->next);
 
-        return oldHead->data;
+        return std::move(oldHead->data);
     }
 
     /**
@@ -134,8 +215,8 @@ public:
             return false;
         }
 
-        std::unique_ptr<Node> oldHead = std::move(head_);
-        head_ = std::move(oldHead->next);
+        NodePtr oldHead = std::move(head_);
+        head_ = NodePtr(oldHead->next);
 
         outputReference = std::move(*oldHead->data);
         return true;
@@ -147,7 +228,7 @@ public:
      * @return true if successful.
      */
     bool tryPop(ElementType& outputReference) {
-        std::unique_ptr<Node> oldHead = popHead();
+        NodePtr oldHead = popHead();
         if (!oldHead) return false;
 
         outputReference = std::move(*oldHead->data);
@@ -159,8 +240,8 @@ public:
      * * @return Shared pointer to data, or nullptr if empty.
      */
     std::shared_ptr<ElementType> tryPop() {
-        std::unique_ptr<Node> oldHead = popHead();
-        return oldHead ? oldHead->data : std::shared_ptr<ElementType>();
+        NodePtr oldHead = popHead();
+        return oldHead ? std::move(oldHead->data) : std::shared_ptr<ElementType>();
     }
 
     /**
@@ -177,8 +258,8 @@ public:
     void clear() {
         std::lock_guard<std::mutex> lock(stackMutex_);
         while (head_) {
-            std::unique_ptr<Node> oldHead = std::move(head_);
-            head_ = std::move(oldHead->next);
+            NodePtr oldHead = std::move(head_);
+            head_ = NodePtr(oldHead->next);
         }
     }
 };
