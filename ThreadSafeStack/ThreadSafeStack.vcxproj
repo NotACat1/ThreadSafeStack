@@ -129,6 +129,7 @@
   <ItemGroup>
     <ClCompile Include="ModernThreadSafeLinkedStack.cpp" />
     <ClCompile Include="ModernThreadSafeStack.cpp" />
+    <ClCompile Include="ModernThreadSafeWaitingLinkedStack.cpp" />
     <ClCompile Include="SharedPtrWaitingThreadSafeStack.cpp" />
     <ClCompile Include="ThreadSafeStack.cpp" />
     <ClCompile Include="WaitingThreadSafeStack.cpp" />
@@ -136,6 +137,7 @@
   <ItemGroup>
     <ClInclude Include="ModernThreadSafeLinkedStack.h" />
     <ClInclude Include="ModernThreadSafeStack.h" />
+    <ClInclude Include="ModernThreadSafeWaitingLinkedStack.h" />
     <ClInclude Include="SharedPtrWaitingThreadSafeStack.h" />
     <ClInclude Include="WaitingThreadSafeStack.h" />
   </ItemGroup>
