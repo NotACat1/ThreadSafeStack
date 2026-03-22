@@ -32,37 +32,37 @@ A comprehensive C++17 library featuring five different implementations of thread
 
 ## 🚀 Benchmark Results (Developer Machine)
 
-_Configuration: 8-Core CPU | 4 Producers / 4 Consumers | 100,000 items per Producer._
+_Configuration: 8 threads (4 Producers / 4 Consumers) | CPU: 8C / 16T @ 1.9 GHz_
+
+---
 
 ### Category: Light Payload (int)
 
-_Focus: Synchronization and Mutex overhead._
+_Focus: synchronization overhead and contention._
 
-| Implementation                    | Load (P/C) | Time (ms) | Throughput (MOps/s) |
-| :-------------------------------- | :--------: | :-------: | :-----------------: |
-| **Basic Mutex Stack**             |    4/4     |   41.43   |       19.308        |
-| **Waiting Mutex Stack**           |    4/4     |   45.03   |       17.766        |
-| **SharedPtr Stack**               |    4/4     |  170.77   |        4.685        |
-| **Linked List Stack**             |    4/4     |  143.87   |        5.560        |
-| **Wait Linked List Stack**        |    4/4     |  146.93   |        5.445        |
-| **Waiting Mutex Stack [WAIT]**    |    4/4     |   43.11   |       18.556        |
-| **SharedPtr Stack [WAIT]**        |    4/4     |  152.55   |        5.244        |
-| **Wait Linked List Stack [WAIT]** |    4/4     |  295.95   |        2.703        |
+| Implementation                 | Threads | Time (ns/op) | Throughput (MOps/s) |
+| ------------------------------ | :-----: | :----------: | :-----------------: |
+| **MutexStack (try_pop)**       |    8    |     327      |        24.46        |
+| **LinkedStack (try_pop)**      |    8    |     1500     |        5.33         |
+|                                |         |              |                     |
+| **BlockingStack (wait)**       |    8    |     321      |        24.93        |
+| **SharedStack (wait)**         |    8    |     1674     |        4.77         |
+| **BlockingLinkedStack (wait)** |    8    |     2232     |        3.58         |
 
-### Category: Heavy Payload (1KB Struct)
+---
 
-_Focus: Memory throughput and lock-holding time._
+### Category: Heavy Payload (~1 KB struct)
 
-| Implementation                    | Load (P/C) | Time (ms) | Throughput (MOps/s) |
-| :-------------------------------- | :--------: | :-------: | :-----------------: |
-| **Basic Mutex Stack**             |    4/4     |  154.82   |        5.167        |
-| **Waiting Mutex Stack**           |    4/4     |  175.16   |        4.567        |
-| **SharedPtr Stack**               |    4/4     |  285.93   |        2.798        |
-| **Linked List Stack**             |    4/4     |  187.21   |        4.273        |
-| **Wait Linked List Stack**        |    4/4     |  185.70   |        4.308        |
-| **Waiting Mutex Stack [WAIT]**    |    4/4     |  123.54   |        6.476        |
-| **SharedPtr Stack [WAIT]**        |    4/4     |  238.62   |        3.353        |
-| **Wait Linked List Stack [WAIT]** |    4/4     |  262.35   |        3.049        |
+_Focus: memory pressure and lock duration._
+
+| Implementation                 | Threads | Time (ns/op) | Throughput (MOps/s) |
+| ------------------------------ | :-----: | :----------: | :-----------------: |
+| **MutexStack (try_pop)**       |    8    |     1030     |        7.76         |
+| **LinkedStack (try_pop)**      |    8    |     1645     |        4.86         |
+|                                |         |              |                     |
+| **BlockingStack (wait)**       |    8    |     938      |        8.53         |
+| **SharedStack (wait)**         |    8    |     2550     |        3.13         |
+| **BlockingLinkedStack (wait)** |    8    |     3312     |        2.41         |
 
 ---
 
