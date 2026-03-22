@@ -127,19 +127,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="ModernThreadSafeLinkedStack.cpp" />
-    <ClCompile Include="ModernThreadSafeStack.cpp" />
-    <ClCompile Include="ModernThreadSafeWaitingLinkedStack.cpp" />
-    <ClCompile Include="SharedPtrWaitingThreadSafeStack.cpp" />
-    <ClCompile Include="ThreadSafeStack.cpp" />
-    <ClCompile Include="WaitingThreadSafeStack.cpp" />
+    <ClCompile Include="BlockingLinkedStack.cpp" />
+    <ClCompile Include="BlockingStack.cpp" />
+    <ClCompile Include="LinkedStack.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="MutexStack.cpp" />
+    <ClCompile Include="SharedStack.cpp" />
+    <ClCompile Include="SharedStack.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ModernThreadSafeLinkedStack.h" />
-    <ClInclude Include="ModernThreadSafeStack.h" />
-    <ClInclude Include="ModernThreadSafeWaitingLinkedStack.h" />
-    <ClInclude Include="SharedPtrWaitingThreadSafeStack.h" />
-    <ClInclude Include="WaitingThreadSafeStack.h" />
+    <ClInclude Include="BlockingLinkedStack.hpp" />
+    <ClInclude Include="BlockingStack .hpp" />
+    <ClInclude Include="IStack.hpp" />
+    <ClInclude Include="IWaitingStack.hpp" />
+    <ClInclude Include="LinkedStack.hpp" />
+    <ClInclude Include="MutexStack.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
