@@ -27,7 +27,7 @@
     <ClCompile Include="BlockingLinkedStack.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="BlockingStack .cpp">
+    <ClCompile Include="BlockingStack.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="LinkedStack.cpp">

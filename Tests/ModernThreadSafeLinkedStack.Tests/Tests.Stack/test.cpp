@@ -5,7 +5,7 @@
 #include <vector>
 #include <atomic>
 #include "../../../ThreadSafeStack/MutexStack.hpp"
-#include "../../../ThreadSafeStack/BlockingStack .hpp"
+#include "../../../ThreadSafeStack/BlockingStack.hpp"
 #include "../../../ThreadSafeStack/SharedStack.hpp"
 #include "../../../ThreadSafeStack/LinkedStack.hpp"
 #include "../../../ThreadSafeStack/BlockingLinkedStack.hpp"

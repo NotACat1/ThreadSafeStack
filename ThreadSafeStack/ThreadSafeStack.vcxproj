@@ -128,7 +128,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BlockingLinkedStack.cpp" />
-    <ClCompile Include="BlockingStack .cpp" />
+    <ClCompile Include="BlockingStack.cpp" />
     <ClCompile Include="LinkedStack.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MutexStack.cpp" />

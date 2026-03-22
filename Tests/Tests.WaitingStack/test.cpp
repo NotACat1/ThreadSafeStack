@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include <thread>
 #include <chrono>
-#include "../../ThreadSafeStack/BlockingStack .hpp"
+#include "../../ThreadSafeStack/BlockingStack.hpp"
 #include "../../ThreadSafeStack/BlockingLinkedStack.hpp"
 
 /**
