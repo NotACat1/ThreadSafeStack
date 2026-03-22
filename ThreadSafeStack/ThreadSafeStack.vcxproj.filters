@@ -13,42 +13,51 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Файлы заголовков\stacks">
+      <UniqueIdentifier>{955ea50d-ac02-4b52-a0e3-eda9afb23895}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ThreadSafeStack.cpp">
+    <ClCompile Include="main.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="ModernThreadSafeStack.cpp">
+    <ClCompile Include="SharedStack.hpp">
+      <Filter>Файлы заголовков\stacks</Filter>
+    </ClCompile>
+    <ClCompile Include="BlockingLinkedStack.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="WaitingThreadSafeStack.cpp">
+    <ClCompile Include="BlockingStack .cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="SharedPtrWaitingThreadSafeStack.cpp">
+    <ClCompile Include="LinkedStack.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="ModernThreadSafeLinkedStack.cpp">
+    <ClCompile Include="MutexStack.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="ModernThreadSafeWaitingLinkedStack.cpp">
+    <ClCompile Include="SharedStack.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ModernThreadSafeStack.h">
+    <ClInclude Include="IStack.hpp">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="WaitingThreadSafeStack.h">
+    <ClInclude Include="LinkedStack.hpp">
+      <Filter>Файлы заголовков\stacks</Filter>
+    </ClInclude>
+    <ClInclude Include="MutexStack.hpp">
+      <Filter>Файлы заголовков\stacks</Filter>
+    </ClInclude>
+    <ClInclude Include="IWaitingStack.hpp">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="SharedPtrWaitingThreadSafeStack.h">
-      <Filter>Файлы заголовков</Filter>
+    <ClInclude Include="BlockingStack .hpp">
+      <Filter>Файлы заголовков\stacks</Filter>
     </ClInclude>
-    <ClInclude Include="ModernThreadSafeLinkedStack.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="ModernThreadSafeWaitingLinkedStack.h">
-      <Filter>Файлы заголовков</Filter>
+    <ClInclude Include="BlockingLinkedStack.hpp">
+      <Filter>Файлы заголовков\stacks</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
